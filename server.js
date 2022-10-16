@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const Contract = require("./models/contracts");
 const Track = require("./models/tracks");
+const xlsx = require("xlsx");
 
 const app = express();
 
@@ -13,7 +14,9 @@ mongoose
   .catch((err) => console.log(err));
 
 app.get("/", (req, res) => {
-  res.send("hi");
+  const workbook = xlsx.readFile(__dirname + "/files/Track Import Test.xlsx");
+
+  res.send(workbook.SheetNames);
 });
 
 app.get("/add-contract", (req, res) => {

@@ -20,7 +20,8 @@
   "homepage": "https://github.com/ChinyeluLyon/curve#readme",
   "dependencies": {
     "express": "^4.18.2",
-    "mongoose": "^6.6.5"
+    "mongoose": "^6.6.5",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
