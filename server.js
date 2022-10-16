@@ -13,29 +13,44 @@ mongoose
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
 
+const contractExists = (contractName, next) => {
+  Contract.find({ name: contractName })
+    .then((result) => {
+      if (result.length > 0) {
+        console.log(result);
+        next();
+      } else {
+        console.log(`${contractName} not found`);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 const handleAliases = (aliasList) => {
   return aliasList.split(";");
 };
 
-const createTracksFromTable = (res, table) => {
-  table.forEach((t, idx) => {
-    console.log(t);
-    console.log(idx);
-    const newTrack = new Track({
-      title: t.Title,
-      version: t.Version,
-      artist: t.Artist,
-      ISRC: t.ISRC,
-      pLine: t["P Line"],
-      aliases: handleAliases(t.Aliases),
-      contract: t.Contract,
+const createTracksFromTable = async (res, table) => {
+  table.forEach((t) => {
+    contractExists(t.Contract, () => {
+      const newTrack = new Track({
+        title: t.Title,
+        version: t.Version,
+        artist: t.Artist,
+        ISRC: t.ISRC,
+        pLine: t["P Line"],
+        aliases: handleAliases(t.Aliases),
+        contract: t.Contract,
+      });
+      newTrack
+        .save()
+        .then((result) => {
+          res.send(result);
+        })
+        .catch((err) => console.log(err));
     });
-    newTrack
-      .save()
-      .then((result) => {
-        res.send(result);
-      })
-      .catch((err) => console.log(err));
   });
 };
 
