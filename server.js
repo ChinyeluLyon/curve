@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const Contract = require("./models/contracts");
 const Track = require("./models/tracks");
 const xlsx = require("xlsx");
-const { builtinModules } = require("module");
 
 const app = express();
 
@@ -52,58 +51,55 @@ const trackExists = (trackTitle) => {
 };
 
 const createTracksFromTable = async (table) => {
-  table.forEach((t) => {
-    contractExists(t.Contract).then((found) => {
-      let contractName;
+  table.forEach(async (t) => {
+    const contractFound = await contractExists(t.Contract);
 
-      if (found) {
-        contractName = t.Contract;
-      }
+    let contractName;
 
-      trackExists(t.Title).then((found) => {
-        if (!found) {
-          const newTrack = new Track({
-            title: t.Title,
-            version: t.Version,
-            artist: t.Artist,
-            ISRC: t.ISRC,
-            pLine: t["P Line"],
-            aliases: t.Aliases.split(";"),
-            contract: contractName,
-          });
-          newTrack
-            .save()
-            .then((result) => {
-              console.log("Saved Track!");
-            })
-            .catch((err) => console.log(err));
-        }
+    if (contractFound) {
+      contractName = t.Contract;
+    }
+
+    const trackFound = await trackExists(t.Title);
+
+    if (!trackFound) {
+      const newTrack = new Track({
+        title: t.Title,
+        version: t.Version,
+        artist: t.Artist,
+        ISRC: t.ISRC,
+        pLine: t["P Line"],
+        aliases: t.Aliases.split(";"),
+        contract: contractName,
       });
-    });
-  });
-};
-
-app.get("/", (req, res) => {
-  const contractName = "Contract 1";
-
-  contractExists(contractName).then((found) => {
-    if (!found) {
-      const contract = new Contract({
-        name: contractName,
-      });
-
-      contract
+      newTrack
         .save()
-        .then(() => {
-          console.log("All good");
+        .then((result) => {
+          console.log("Saved Track!");
         })
         .catch((err) => console.log(err));
     }
-    res.redirect("http://localhost:3000/add-from-file");
   });
-});
+};
 
-app.get("/add-from-file", (req, res) => {
+app.get("/", async (req, res) => {
+  const contractName = "Contract 1";
+
+  const found = await contractExists(contractName);
+
+  if (!found) {
+    const contract = new Contract({
+      name: contractName,
+    });
+
+    contract
+      .save()
+      .then(() => {
+        console.log("All good");
+      })
+      .catch((err) => console.log(err));
+  }
+
   const workbook = xlsx.readFile(__dirname + "/files/Track Import Test.xlsx");
 
   workbook.SheetNames.forEach((sheet) => {
