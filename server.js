@@ -14,9 +14,14 @@ mongoose
   .catch((err) => console.log(err));
 
 app.get("/", (req, res) => {
+  const workSheets = {};
   const workbook = xlsx.readFile(__dirname + "/files/Track Import Test.xlsx");
 
-  res.send(workbook.SheetNames);
+  workbook.SheetNames.forEach((sheet) => {
+    workSheets[sheet] = xlsx.utils.sheet_to_json(workbook.Sheets[sheet]);
+  });
+
+  res.send(workSheets);
 });
 
 app.get("/add-contract", (req, res) => {
