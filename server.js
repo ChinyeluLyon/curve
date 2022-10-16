@@ -110,4 +110,30 @@ app.get("/", async (req, res) => {
   });
 });
 
+app.get("/clear", async (req, res) => {
+  mongoose.connection.collections.contracts?.deleteMany();
+  mongoose.connection.collections.tracks?.deleteMany();
+  res.send("Cleared");
+});
+
+app.get("/contracts", async (req, res) => {
+  Contract.find()
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
+app.get("/tracks", async (req, res) => {
+  Track.find()
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+});
+
 module.exports = { contractExists, trackExists };
