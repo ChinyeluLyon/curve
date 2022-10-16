@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx mocha tests.js"
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   "homepage": "https://github.com/ChinyeluLyon/curve#readme",
   "dependencies": {
     "express": "^4.18.2",
+    "mocha": "^10.1.0",
     "mongoose": "^6.6.5",
     "xlsx": "^0.18.5"
   },

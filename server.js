@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Contract = require("./models/contracts");
 const Track = require("./models/tracks");
 const xlsx = require("xlsx");
+const { builtinModules } = require("module");
 
 const app = express();
 
@@ -13,22 +14,6 @@ mongoose
   .connect(dbURI)
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
-
-const contractExistsOld = (contractName, next) => {
-  Contract.find({ name: contractName })
-    .then((result) => {
-      if (result.length > 0) {
-        console.log(`${contractName} found`);
-        next(true);
-      } else {
-        console.log(`${contractName} not found`);
-        next(false);
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
 
 const contractExists = (contractName) => {
   return new Promise(async (resolve, reject) => {
@@ -128,3 +113,5 @@ app.get("/add-from-file", (req, res) => {
     res.send("Date: " + new Date());
   });
 });
+
+module.exports = { contractExists, trackExists };
