@@ -18,9 +18,10 @@ const contractExists = (contractName, next) => {
     .then((result) => {
       if (result.length > 0) {
         console.log(result);
-        next();
+        next(true);
       } else {
         console.log(`${contractName} not found`);
+        next(false);
       }
     })
     .catch((err) => {
@@ -34,7 +35,13 @@ const handleAliases = (aliasList) => {
 
 const createTracksFromTable = async (res, table) => {
   table.forEach((t) => {
-    contractExists(t.Contract, () => {
+    contractExists(t.Contract, (found) => {
+      let contractName;
+
+      if (found) {
+        contractName = t.Contract;
+      }
+
       const newTrack = new Track({
         title: t.Title,
         version: t.Version,
@@ -42,7 +49,7 @@ const createTracksFromTable = async (res, table) => {
         ISRC: t.ISRC,
         pLine: t["P Line"],
         aliases: handleAliases(t.Aliases),
-        contract: t.Contract,
+        contract: contractName,
       });
       newTrack
         .save()
