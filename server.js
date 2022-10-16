@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const Contract = require("./models/contracts");
+const Track = require("./models/tracks");
 
 const app = express();
 
@@ -12,4 +14,17 @@ mongoose
 
 app.get("/", (req, res) => {
   res.send("hi");
+});
+
+app.get("/add-contract", (req, res) => {
+  const contract = new Contract({
+    name: "Contract 1",
+  });
+
+  contract
+    .save()
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((err) => console.log(err));
 });
