@@ -13,15 +13,40 @@ mongoose
   .then((result) => app.listen(3000))
   .catch((err) => console.log(err));
 
+const handleAliases = (aliasList) => {
+  return aliasList.split(";");
+};
+
+const createTracksFromTable = (res, table) => {
+  table.forEach((t, idx) => {
+    console.log(t);
+    console.log(idx);
+    const newTrack = new Track({
+      title: t.Title,
+      version: t.Version,
+      artist: t.Artist,
+      ISRC: t.ISRC,
+      pLine: t["P Line"],
+      aliases: handleAliases(t.Aliases),
+      contract: t.Contract,
+    });
+    newTrack
+      .save()
+      .then((result) => {
+        res.send(result);
+      })
+      .catch((err) => console.log(err));
+  });
+};
+
 app.get("/", (req, res) => {
-  const workSheets = {};
   const workbook = xlsx.readFile(__dirname + "/files/Track Import Test.xlsx");
 
   workbook.SheetNames.forEach((sheet) => {
-    workSheets[sheet] = xlsx.utils.sheet_to_json(workbook.Sheets[sheet]);
-  });
+    tableData = xlsx.utils.sheet_to_json(workbook.Sheets[sheet]).slice(1);
 
-  res.send(workSheets);
+    createTracksFromTable(res, tableData);
+  });
 });
 
 app.get("/add-contract", (req, res) => {
